@@ -1,10 +1,7 @@
 class DnsRecordsController < ApplicationController
 
   def index
-    @dns_records = DnsRecord
-                     .included_hostnames(params[:included])
-                     .excluded_hostnames(params[:excluded])
-                     .distinct
+    @dns_records = DnsQuery.filter(params[:included], params[:excluded])
 
     @hostnames = RelatedHostnames.to(@dns_records, params[:included], params[:excluded])
   end

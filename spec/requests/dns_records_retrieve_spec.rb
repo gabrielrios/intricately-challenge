@@ -40,19 +40,18 @@ RSpec.describe "DnsRecords Retrieve", type: :request do
       end
     end
 
-    it "returns only records that include sit.com" do
-      get dns_records_path(included: "sit.com"), headers: headers
+    it "returns only records that include dolor.com and sit.com" do
+      get dns_records_path(included: %w(sit.com dolor.com)), headers: headers
 
       expect(response).to have_http_status(:success)
 
       parsed_body = JSON.parse(response.body, symbolize_names: true)
       expect(parsed_body[:total_records]).to eq(2)
 
-      expect(parsed_body[:related_hostnames].size).to eq(1)
+      expect(parsed_body[:related_hostnames].size).to eq(2)
 
-      related_hostname = parsed_body[:related_hostnames].first
-
-      expect(related_hostname[:count]).to eq(2)
+      related_hostnames = parsed_body[:related_hostnames].map{ |r| r[:hostname] }
+      expect(related_hostnames).to eq(%w(ipsum.com amet.com))
     end
 
     it "retuns only records that excludes sit.com" do
@@ -67,7 +66,8 @@ RSpec.describe "DnsRecords Retrieve", type: :request do
 
       related_hostname = parsed_body[:related_hostnames].first
 
-      expect(related_hostname[:count]).to eq(1)
+      related_hostnames = parsed_body[:related_hostnames].map{ |r| r[:hostname] }
+      expect(related_hostnames).to eq(%w(lorem.com ipsum.com dolor.com amet.com))
     end
 
     it "returns only record that includes ipsum.com, dolor.com and excludes sit.com" do
@@ -78,8 +78,11 @@ RSpec.describe "DnsRecords Retrieve", type: :request do
       parsed_body = JSON.parse(response.body, symbolize_names: true)
       expect(parsed_body[:total_records]).to eq(2)
 
-      ips = parsed_body[:records].map(&:ip)
+      ips = parsed_body[:records].map{ |r| r[:ip_address] }
       expect(ips).to eq(["1.1.1.1", "3.3.3.3"])
+
+      related_hostnames = parsed_body[:related_hostnames].map{ |r| r[:hostname] }
+      expect(related_hostnames).to eq(%w(lorem.com amet.com))
     end
   end
 end
