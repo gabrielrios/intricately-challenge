@@ -65,6 +65,7 @@ Query the DNS record database, you can filter the results based on the following
 + excluded (array[string]) - A list of hostnames the DNS records should not have (optional parameter)
 + page (integer) - A page number (required)
 
+<br/>
 
 + Request (application/json)
 
