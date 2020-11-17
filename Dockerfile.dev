@@ -1,0 +1,43 @@
+# Pre setup stuff
+FROM ruby:2.7 as builder
+
+# Install system dependencies & clean them up
+# libnotify-dev is what allows you to watch file changes w/ HMR
+RUN apt-get update -qq && apt-get install -y \
+    postgresql-client build-essential \
+    libnotify-dev && \ 
+    rm -rf /var/lib/apt/lists/*
+
+# This is where we build the rails app
+FROM builder as rails-app
+
+# Allow access to port 3000 & 3035
+EXPOSE 3000
+
+# This is to fix an issue on Linux with permissions issues
+ARG APP_DIR=/intricately
+
+# Remove existing running server
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+
+# fixing Permissions
+RUN mkdir -p $APP_DIR
+
+WORKDIR $APP_DIR
+
+# Install rails related dependencies
+COPY Gemfile* $APP_DIR/
+
+# Fix an issue with outdated bundler
+RUN gem install bundler
+RUN bundle install
+
+# Copy over all files
+COPY . .
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+
+# Start the main process.
+CMD ["rails", "server", "-p", "3000", "-b", "0.0.0.0"]
+
