@@ -3,4 +3,6 @@ class DnsRecord < ApplicationRecord
   has_many :hostnames, through: :dns_record_hostnames
 
   accepts_nested_attributes_for :hostnames
+
+  validates :ip, :hostnames, presence: true
 end
