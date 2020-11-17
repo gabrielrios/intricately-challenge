@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'DnsRecords', type: :request do
+RSpec.describe 'DnsRecords Creation', type: :request do
   describe 'POST /dns_records' do
     let(:headers) do
       { 'CONTENT_TYPE' => 'application/json',
