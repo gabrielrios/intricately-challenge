@@ -40,6 +40,22 @@ RSpec.describe "DnsRecords Retrieve", type: :request do
       end
     end
 
+    it 'paginates the results' do
+      pagy_items = Pagy::VARS[:items]
+      Pagy::VARS[:items] = 1
+      get dns_records_path(page: 2), headers: headers
+      expect(response).to have_http_status(:success)
+
+      parsed_body = JSON.parse(response.body, symbolize_names: true)
+      expect(parsed_body[:total_records]).to eq(1)
+
+      related_hostnames = parsed_body[:related_hostnames].map{ |r| r[:hostname] }
+      expect(related_hostnames).to eq(%w(ipsum.com))
+
+      Pagy::VARS[:items] = pagy_items
+    end
+
+
     it "returns only records that include dolor.com and sit.com" do
       get dns_records_path(included: %w(sit.com dolor.com)), headers: headers
 

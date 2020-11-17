@@ -1,7 +1,9 @@
 class DnsRecordsController < ApplicationController
 
   def index
-    @dns_records = DnsQuery.filter(params[:included], params[:excluded])
+    @pagy, @dns_records = pagy(DnsQuery.filter(params[:included], params[:excluded]))
+
+    pagy_headers_merge(@pagy)
 
     @hostnames = RelatedHostnames.to(@dns_records, params[:included], params[:excluded])
   end
