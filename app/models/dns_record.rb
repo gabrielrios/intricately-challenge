@@ -6,6 +6,27 @@ class DnsRecord < ApplicationRecord
 
   validates :ip, :dns_record_hostnames, presence: true
 
+  def self.included_hostnames(included)
+    if included
+      joins(:hostnames)
+        .where(hostnames: { hostname: included })
+    else
+      where(nil)
+    end
+  end
+
+  def self.excluded_hostnames(excluded)
+    if excluded
+      dns_with_hostname = DnsRecordHostname
+                            .joins(:hostname)
+                            .where(hostnames: { hostname: excluded })
+                            .pluck(:dns_record_id)
+      where.not(id: dns_with_hostname)
+    else
+      where(nil)
+    end
+  end
+
   def hostnames_attributes=(hostnames_attributes)
     hostnames_attributes.each do |hostname_attributes|
       hostname = Hostname.where(hostname_attributes).first_or_initialize
@@ -13,5 +34,4 @@ class DnsRecord < ApplicationRecord
       dns_record_hostnames.build(hostname: hostname)
     end
   end
-
 end

@@ -4,7 +4,7 @@ RSpec.describe 'DnsRecords Creation', type: :request do
   describe 'POST /dns_records' do
     let(:headers) do
       { 'CONTENT_TYPE' => 'application/json',
-        'ACCETP' => 'application/json' }
+        'ACCEPT' => 'application/json' }
     end
 
     it 'create dns record with associated hostnames' do

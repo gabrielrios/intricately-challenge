@@ -1,5 +1,14 @@
 class DnsRecordsController < ApplicationController
 
+  def index
+    @dns_records = DnsRecord
+                     .included_hostnames(params[:included])
+                     .excluded_hostnames(params[:excluded])
+                     .distinct
+
+    @hostnames = RelatedHostnames.to(@dns_records, params[:included], params[:excluded])
+  end
+
   def create
     @dns_record = DnsRecord.new(dns_record_params)
 
