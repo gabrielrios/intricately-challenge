@@ -1,7 +1,20 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+[
+  { ip: "1.1.1.1",
+    hostnames: %w(lorem.com ipsum.com dolor.com amet.com) },
+  { ip: "2.2.2.2",
+    hostnames: %w(ipsum.com) },
+  { ip: "3.3.3.3",
+    hostnames: %w(ipsum.com dolor.com amet.com) },
+  { ip: "4.4.4.4",
+    hostnames: %w(ipsum.com dolor.com sit.com amet.com)},
+  { ip: "5.5.5.5",
+    hostnames: %w(dolor.com sit.com)}
+].each do |attributes|
+  hostnames = attributes[:hostnames].map do |hostname|
+    { hostname: hostname }
+  end
+
+  next if DnsRecord.where(ip: attributes[:ip]).exists?
+  DnsRecord.create(ip: attributes[:ip],
+                   hostnames_attributes: hostnames)
+end
