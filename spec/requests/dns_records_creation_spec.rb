@@ -58,5 +58,24 @@ RSpec.describe 'DnsRecords Creation', type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
+
+    it 'creates hostname only once' do
+      hostname = build(:hostname, hostname: 'lorem.com')
+      dns_record = create(:dns_record, hostnames: [hostname])
+
+      payload = {
+        dns_records: {
+          ip: '1.1.1.1',
+          hostnames_attributes: [{ hostname: hostname.hostname }]
+        }
+      }
+
+      expect do
+        post dns_records_path, params: payload.to_json, headers: headers
+      end.to_not change { Hostname.count }
+
+      expect(response).to be_created
+
+    end
   end
 end
